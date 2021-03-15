@@ -1,0 +1,101 @@
+CREATE TABLE Library(
+	lib_id INT PRIMARY KEY,
+	f_name VARCHAR(20),
+	l_name VARCHAR(20),
+	Age VARCHAR(20),
+	Salary INT,
+	Super_id INT,
+	Client_id INT,
+	FOREIGN KEY(Super_id) REFERENCES Library(lib_id)
+);
+
+
+CREATE TABLE Teacher(
+	Client_id INT PRIMARY KEY,
+	Client_name VARCHAR(20),
+	Salary INT,
+	Program VARCHAR(20)
+);
+
+ALTER TABLE Library
+ADD FOREIGN KEY(Client_id) REFERENCES Teacher(Client_id);
+DROP TABLE Library;
+DROP TABLE Teacher;
+INSERT INTO Library VALUES(101,"Rahul","Kumar",25,20000,NULL,5);
+INSERT INTO Library VALUES(102,"Karan","Singh",25,20000,NULL,4);
+INSERT INTO Library VALUES(103,"Raj","Sharma",25,20000,NULL,3);
+INSERT INTO Library VALUES(104,"Amneet","Kp",25,20000,NULL,2);
+INSERT INTO Library VALUES(105,"Maneet","Singh",25,20000,NULL,3);
+INSERT INTO Library VALUES(106,"Rohit","Kapoor",25,20000,NULL,2);
+
+INSERT INTO Teacher VALUES(2,"Docker",55000,"C++");
+INSERT INTO Teacher VALUES(3,"Git",15000,"C++");
+INSERT INTO Teacher VALUES(4,"Maven",95000,"C++");
+INSERT INTO Teacher VALUES(5,"Bitbucket",65000,"C++");
+
+UPDATE Library
+SET Super_id = 104
+WHERE lib_id>=106; 
+
+SELECT * FROM Library
+SELECT * FROM Teacher
+
+UPDATE Teacher
+SET program="R"
+WHERE Client_id=5;
+
+SELECT lib_id,l_name
+FROM Library
+ORDER BY lib_id DESC
+
+SELECT * 
+FROM Teacher
+Group BY Program
+
+SELECT f_name,l_name,Age
+FROM Library
+WHERE f_name Like "M%"
+
+SELECT Library.f_name,Library.l_name,Teacher.Client_name
+FROM Library
+FULL JOIN Teacher
+ON Library.Client_id = Teacher.Client_id
+
+SELECT Library.f_name,Library.l_name
+FROM Library
+WHERE Library.Client_id IN(
+    SELECT Teacher.Client_id
+    FROM Teacher
+    WHERE Program LIKE "C%"
+)
+
+
+---Triggers
+CREATE TABLE trigger_lib(
+    message VARCHAR(100)
+);
+ALTER TABLE trigger_lib
+ADD name VARCHAR(20);
+
+DELIMITER $$
+CREATE
+    TRIGGER my_trigger5 BEFORE INSERT
+    On Library
+    For EACH ROW BEGIN
+        INSERT INTO trigger_lib VALUES("Value added",NULL);
+    END$$
+
+DELIMITER ;
+
+
+
+INSERT INTO Library VALUES(299,"Shivam","Garg",29,"1000000",101,2);
+DESCRIBE Library;
+
+SELECT * from trigger_lib 
+
+
+
+
+
+
