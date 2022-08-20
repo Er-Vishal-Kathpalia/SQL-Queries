@@ -1,0 +1,386 @@
+CREATE DATABASE vishal;
+
+USE vishal;
+
+CREATE TABLE employee (
+emp_id INT PRIMARY KEY,
+first_name VARCHAR(50),
+last_name VARCHAR(50),
+birth_date DATE,
+sex VARCHAR(1),
+salary FLOAT,
+super_id INT,
+branch_id INT
+);
+
+INSERT INTO employee(emp_id,first_name,last_name,sex,super_id,branch_id) VALUES(106,"William","Kathpalia","M","1006","16"); -- values will also go null 
+INSERT INTO employee(emp_id,first_name,last_name,sex,super_id,branch_id) VALUES(107,"William","Kathpalia","F","1006","16"); -- values will also go null 
+INSERT INTO employee(emp_id,first_name,last_name,sex,super_id,branch_id) VALUES(108,"William","Kathpalia","F","1006","16"); -- values will also go null 
+
+-- null value = no value 
+
+INSERT INTO employee VALUES(100,"Vishal","Kathpalia",'2000-08-23',"M",20.11,1000,10);
+INSERT INTO employee VALUES(101,"Puneet","Kathpalia",'2009-08-23',"M",20.11,1001,11);
+INSERT INTO employee VALUES(102,"Harry","Sharma",'2002-08-23',"F",20.11,1002,12);
+INSERT INTO employee VALUES(103,"Kajal","Rani",'2001-09-23',"M",20.11,1003,13);
+INSERT INTO employee VALUES(104,"Ekta","Verma",'2003-04-23',"M",20.11,1004,14);
+INSERT INTO employee VALUES(105,"Ekta","Verma",'2003-04-23',"M",20.11,1004,14);
+
+CREATE TABLE branch (
+  branch_id INT PRIMARY KEY,
+  branch_name VARCHAR(40),
+  mgr_id INT,
+  mgr_start_date DATE,
+  FOREIGN KEY(mgr_id) REFERENCES employee(emp_id) ON DELETE SET NULL
+);
+
+INSERT INTO branch VALUES(10,"GOOGLE",101,'2022-01-17');
+INSERT INTO branch VALUES(11,"AMAZON",101,'2022-01-17');
+INSERT INTO branch VALUES(12,"META",102,'2022-09-19');
+
+SELECT * FROM branch;
+
+SELECT * FROM employee;
+SELECT first_name,last_name FROM employee;
+
+-- DISTINCT IS USE FOR UNIQUE
+SELECT DISTINCT first_name FROM employee;
+-- COUNT FUN IS USE FOR counting
+SELECT COUNT(DISTINCT first_name) FROM employee;
+
+SELECT * 
+FROM employee
+WHERE emp_id=100;
+
+-- '' vs "" quite similar
+-- OPERATORS =, <,>,<=,>=,==,<>,BETWEEN,LIKE,IN
+-- <>--> NOT EQUAL, BETWEEN--> in between ranges,LIKE --> searching for pattern, IN --> to specify multiple possible values for columns
+
+-- AND(&&) ,OR(||),NOT
+SELECT * 
+FROM employee
+WHERE first_name='Ekta' && branch_id=14;
+
+SELECT * 
+FROM employee
+WHERE first_name='Ekta' AND branch_id=14;
+
+SELECT * 
+FROM employee
+WHERE NOT first_name='Kajal';
+
+-- IS NULL OR NULL VALUE
+
+SELECT * FROM employee
+WHERE salary IS NULL;
+
+SELECT * FROM employee
+WHERE salary IS NOT NULL;
+
+-- ORDER BY is used to sort the result in asc,desc by default asc;
+SELECT * FROM employee ORDER BY first_name;
+SELECT * FROM employee ORDER BY first_name ASC;
+SELECT * FROM employee ORDER BY first_name DESC;
+
+SELECT * 
+FROM employee 
+ORDER BY first_name, last_name DESC;
+
+SELECT * 
+FROM employee 
+ORDER BY first_name ASC, last_name DESC;
+
+-- UPDATE is used to modify the records
+-- Unlock the safe update mode first and then lock. 
+SET SQL_SAFE_UPDATES=0;
+
+UPDATE employee
+SET salary=10.14
+WHERE first_name='EKTA'; 
+
+SET SQL_SAFE_UPDATES=1;
+
+-- DELETE
+DELETE FROM employee
+WHERE first_name ='WILLIAM' && sex='F';
+
+DELETE FROM employee;
+
+-- LIMIT is used to limit the no of records
+
+SELECT * 
+FROM employee 
+LIMIT 3; 
+
+-- MIN and MAX
+SELECT MIN(salary)
+FROM employee; 
+
+SELECT MAX(salary)
+FROM employee; 
+
+SELECT MAX(salary) AS Minimum_Salary
+FROM employee
+WHERE salary; 
+
+SELECT *
+FROM employee
+WHERE salary IS NOT NULL
+ORDER BY salary ASC
+LIMIT 1;
+
+-- COUNT,AVG,SUM
+SELECT COUNT(salary) AS Minimum_Salary
+FROM employee
+WHERE salary;
+
+SELECT AVG(salary) AS Minimum_Salary
+FROM employee
+WHERE salary;
+
+SELECT SUM(salary) AS Minimum_Salary
+FROM employee
+WHERE salary;
+
+-- WILDCARD ENTERIES--> LIKE operator 
+-- % --> zero,one or multiple char 
+-- _ --> one or single char %a,a%,%a%,_r%,a_%,a__%,a%o
+SELECT *
+FROM employee
+WHERE first_name LIKE '%E%';
+
+-- IN,NOT IN operator--> help to select multiple value in where clause
+SELECT *
+FROM employee
+WHERE first_name IN ("Vishal","Ekta");
+
+SELECT * 
+FROM employee
+WHERE salary NOT IN(SELECT MAX(salary)
+FROM vishal.employee);
+
+-- BETWEEN,NOT BETWEEN statement between range
+SELECT *
+FROM employee
+WHERE salary BETWEEN 10 AND 20; 
+
+SELECT *
+FROM employee
+WHERE salary NOT BETWEEN 10 AND 20; 
+
+SELECT *
+FROM employee
+WHERE birth_date BETWEEN '2000-01-01' AND '2000-12-12' OR first_name LIKE 'E%';
+
+-- ALIASES 
+SELECT e.first_name AS FIRST_NAME,emp_id as EMP_ID
+FROM vishal.employee AS e; 
+
+-- JOINS --> INNER,OUTHER,LEFT,RIGHT,SELF,CROSS
+SELECT *
+FROM employee
+INNER JOIN branch ON employee.emp_id = branch.mgr_id;
+
+SELECT *
+FROM employee
+LEFT JOIN branch ON employee.emp_id = branch.mgr_id;
+
+SELECT *
+FROM employee
+RIGHT JOIN branch ON employee.emp_id = branch.mgr_id;
+
+SELECT *
+FROM branch
+RIGHT JOIN employee ON employee.emp_id = branch.mgr_id;
+
+SELECT *
+FROM employee
+CROSS JOIN branch;
+
+SELECT first_name
+FROM employee emp, branch bch
+WHERE emp.emp_id = bch.mgr_id;
+
+-- UNION,UNION ALL
+SELECT emp_id FROM employee
+UNION
+SELECT mgr_id FROM branch; 
+
+SELECT emp_id FROM employee
+UNION ALL
+SELECT mgr_id FROM branch;
+
+-- GROUP BY
+SELECT COUNT(first_name),first_name
+FROM employee
+GROUP BY first_name; 
+
+-- HAVING clause
+SELECT first_name, COUNT(first_name)
+FROM employee
+GROUP BY first_name
+HAVING COUNT(salary)>10.50;
+
+-- EXISTS
+SELECT *
+FROM employee
+WHERE emp_id =(
+SELECT mgr_id
+FROM branch 
+WHERE branch_name='GOOGLE'
+);
+
+SELECT *
+FROM employee
+WHERE EXISTS(
+SELECT mgr_id
+FROM branch 
+WHERE branch_name='GOOGLE'
+);
+
+--  Comment /* */ or --
+
+/*
+--  Operators 
+ +,-,*,/,%
+ &,|,^
+ =,<,>,<=,>=,<>
+ +=,-=,*=,/=,%=,&=,^-=,|*=
+ AND,OR,ANY,EXISTS,HAVING,BETWEEN,IN,LIKE,NOT,SOME,ALL
+*/
+
+CREATE DATABASE temp_vishal;
+
+-- DROP table 
+DROP DATABASE database_name;
+CREATE TABLE tableName(_);
+
+-- CREATE Table From another table 
+CREATE TABLE temp_employee AS
+SELECT first_name, last_name
+FROM employee;
+
+SELECT * FROM temp_employee;
+
+-- DROP will drop all the data with  data itself but TRUNCATE will delete only data
+DROP TABLE tableName;
+TRUNCATE TABLE tableName;
+
+-- ALTER table --add column,delete column or modify column
+ALTER TABLE temp_employee
+ADD Email VARCHAR(50);
+
+ALTER TABLE tableName
+DROP COLUMN columnName;
+
+ALTER TABLE temp_employee
+MODIFY COLUMN Email INT;
+
+-- CONSTRAINTS 
+/*
+NOT NULL
+UNIQUE
+PRIMARY KEY-- notnull+unique
+FOREIGN KEY-- links between tables
+CHECK-- check if the value in the column satisfy the condition
+DEFAULT-- default value if no value
+CREATE INDEX-- 	used to create and retrieve the data from database very quickly
+*/ 
+
+CREATE TABLE Person(
+ID INT PRIMARY KEY,
+FULL_NAME VARCHAR(100) NOT NULL 
+);
+
+ALTER TABLE temp_employee
+ADD Email INT NOT NULL; -- 0 value
+ 
+ALTER TABLE temp_employee
+ADD birth_year Year CHECK(birth_year>=2000);
+
+INSERT INTO temp_employee VALUES("Krishan","Radha",20,"10","val",2001);
+
+ALTER TABLE temp_employee
+ADD Info VARCHAR(20) DEFAULT 'default';
+
+-- INDEX is used for fast searching but updating is bit slow so avoid update and apply only on searchable fields 
+CREATE INDEX Full_Name
+ON temp_employee(first_name,last_name);
+
+ALTER TABLE tableName
+DROP INDEX indexName;
+
+-- AUTO INCREMENT
+CREATE TABLE tableName(id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR(10)
+);
+
+INSERT INTO tableName VALUES();
+
+ALTER TABLE temp_employee AUTO_INCREMENT=100;
+
+-- Mysql Dates 
+/*
+DATE--YYYY-MM-DD
+DATETIME-- YYYY-MM-DD HH:MI:SS
+TIMESTAMP-- YYYY-MM-DD HH:MI:SS
+YEAR- YYYY or YY
+*/
+
+-- Mysql Views-->It is a virtual table based upon the result-set of the sql statement
+-- View also contain rows and cols just like an original table
+CREATE VIEW view_name AS
+SELECT * FROM employee
+WHERE salary>10;
+
+SELECT * FROM view_name;
+
+DROP VIEW view_name;
+-- STRING
+/*
+CHAR(size)
+VARCHAR(size)
+BINARY(size) stores binary bite strings
+VARBINARY(size) stores binary bite String
+TINYBLOB
+TINYTEXT
+TEXT(size)
+BLOB(size)
+MEDIUMTEXT
+MEDIUMBLOB
+LONGTEXt
+LONGBLOB
+ENUM(v1,v2,v3)
+SET(v1,v2)
+*/
+-- Numeric
+/*
+BIT(size)
+TINYINT(size)
+BOOL 0-false, 1-true
+BOOLEAN
+SMALLINT
+MEDIUMINT
+INT(size)
+INTEGER(size)
+BIGINT(size)
+FLOAT(size,d)
+FLOAT(p)
+DOUBLE(size,d)
+DOUBLE PRECISION(size,d)
+DECIMAL(size,d)
+DEC(size,d)
+*/ 	
+-- Date and Time Data Type
+/*
+DATE
+DATETIME
+TIMESTAMP
+TIME
+YEAR
+*/
+
+-- MYsql Functions
+-- LOWER,UPPER,MIN, MID,LENGTH,LEFT,RIGHT,REPEAT,UCASE TRIM,SUBSTR,SUBSTRING_INDEX,REPLACE,REPEAT,LCASE,INSERT etc
+ 
+-- TO BE CONTINUE
